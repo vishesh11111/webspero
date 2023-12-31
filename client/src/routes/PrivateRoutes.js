@@ -2,16 +2,17 @@ import React, { useEffect } from 'react';
 import { Navigate, useNavigate } from 'react-router';
 
 export const PrivateRoutes = ({ child }) => {
-    const user = JSON.parse(localStorage.getItem("user"));
-    const navigate = useNavigate()
+    const user = localStorage.getItem("token");
+    const navigate = useNavigate();
+
+    if (user) {
+        return child;
+    }
 
     useEffect(() => {
-        if (user) {
-            return child; // Render the child component if the user is authenticated
-        } else {
+        if (!user) {
             navigate("/signin")
-            // return <Navigate to="/signin" replace={true}/>; // Redirect to the sign-in page
         }
-    }, [])
+    }, [user])
 
 };

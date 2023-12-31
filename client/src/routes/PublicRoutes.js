@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router';
 
 export const PublicRoutes = ({ child }) => {
-    const user = JSON.parse(localStorage.getItem("user"));
+    const user = localStorage.getItem("token");
     const navigate = useNavigate();
 
     useEffect(() => {

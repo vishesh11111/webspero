@@ -6,26 +6,57 @@ import TextField from '@mui/material/TextField';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Checkbox from '@mui/material/Checkbox';
 import Grid from '@mui/material/Grid';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import Box from '@mui/material/Box';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
+import { signIn } from '../../../api/Api_Wrapper';
+import MuiAlert from '@mui/material/Alert';
 
+
+
+// TODO remove, this demo shouldn't need to reset the theme.
+
+
+const Alert = React.forwardRef(function Alert(props, ref) {
+    return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
+});
 
 // TODO remove, this demo shouldn't need to reset the theme.
 
 const defaultTheme = createTheme();
 
 export function SignIn() {
-    const handleSubmit = (event) => {
+    const [error, setError] = React.useState({ errorCode: 0, msg: "" });
+    const navigate = useNavigate();
+
+    const handleSubmit = async (event) => {
         event.preventDefault();
         const data = new FormData(event.currentTarget);
         console.log({
             email: data.get('email'),
             password: data.get('password'),
         });
+        const signIndata = await signIn({
+            email: data.get('email'),
+            password: data.get('password'),
+        })
+        if (signIndata?.status) {
+            setError({ errorCode: 1, msg: signIndata?.message });
+            setTimeout(() => {
+                navigate("/")
+                setError({ errorCode: 0, msg: "" });
+            }, 1000);
+        } else {
+            console.log("-----((((",signIndata)
+            setError({ errorCode: 2, msg: signIndata?.message });
+            setTimeout(() => {
+                setError({ errorCode: 0, msg: "" });
+            }, 2000);
+        }
+        // console.log("--->", signIndata)
     };
 
     return (
@@ -90,6 +121,8 @@ export function SignIn() {
                     </Box>
                 </Box>
             </Container>
+            {error.errorCode == 1 && <Alert severity="success">{error?.msg}</Alert>}
+            {error?.errorCode == 2 && <Alert severity="error">{error?.msg}</Alert>}
         </ThemeProvider>
     );
 }
